@@ -1,0 +1,2 @@
+# panscan
+Pangenome analyses toolkit
