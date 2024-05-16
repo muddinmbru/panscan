@@ -34,3 +34,5 @@ Run the **panscan complex** to run the command in full to produce complex region
 
 ## Variant analyses
 
+The program will convert multi-allelic VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
+
