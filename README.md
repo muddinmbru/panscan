@@ -5,6 +5,9 @@ Pangenome analyses toolkit
 ## Requirements
 Requires Python >= 3.7
 
+Matplotlib
+perl
+pandas
 [GFABase](https://github.com/mlin/gfabase) must be installed and be accessible in the shell.
 [Bandage](https://github.com/rrwick/Bandage) should be installed and added to the path for plotting.
 
