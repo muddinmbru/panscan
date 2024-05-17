@@ -58,6 +58,16 @@ def run_gene_dup(csv_file):
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running panscan gene_dup: {e}")
 
+def run_panscan_novel_seq(vcf1, vcf2):
+    """
+    Runs the panscan novel_seq command.
+    """
+    try:
+        novel_seq_cmd = f"panscan novel_seq {vcf1} {vcf2}"
+        subprocess.run(novel_seq_cmd, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while running panscan novel_seq: {e}")
+
 def main():
     parser = argparse.ArgumentParser(description="Panscan tool to analyze complex loci, perform variant analysis, and gene duplication detection.")
     
@@ -74,9 +84,16 @@ def main():
     complex_parser.add_argument("--sites", type=int, default=1, help="Number of complex sites in a region to define it as complex (default: 1).")
     complex_parser.add_argument("--sv", type=int, default=1, help="Number of secondary SVs in a region to define it as complex (default: 1).")
     
+    # Novel seq command
+    novel_seq_parser = subparsers.add_parser("novel_seq", help="Detect novel sequences from two VCF files.")
+    novel_seq_parser.add_argument("vcf1", help="Path to the first VCF file.")
+    novel_seq_parser.add_argument("vcf2", help="Path to the second VCF file.")
+    
     # Variant analysis command
     variant_analysis_parser = subparsers.add_parser("variant_analysis", help="Perform variant analysis on a VCF file.")
     variant_analysis_parser.add_argument("vcf_file", help="Path to the VCF file for variant analysis.")
+    variant_analysis_parser.add_argument("--output", help="Output directory to save the results.")
+    variant_analysis_parser.add_argument("--")
     
     # Gene duplication command
     gene_dup_parser = subparsers.add_parser("gene_dup", help="Detect gene duplications from a CSV file.")
@@ -520,6 +537,10 @@ def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output
         json.dump(json_ready_result, f, indent=4)
 
     return result
+
+
+def call_novel_seq(vcf1, vcf2):
+    subprocess.call(f"perl findNovelSeq.pl {vcf1} {vcf2}")
         
         
 def call_variant_analysis(vcf):
