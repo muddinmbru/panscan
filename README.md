@@ -33,6 +33,12 @@ for a region to be considered complex.
 ### End-to-end
 Run the **panscan complex** to run the command in full to produce complex regions and haplotype walks for each sample in all the regions. 
 
+## Gene-duplication analyses
+
+It takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
+Duplications per assembly
+Venn diagram of duplications w.r.t hprc and cpc
+Frequency comparison of your duplications w.r.t. hprc and cpc . Plots the most distinct ones
 
 
 ## Variant analyses
