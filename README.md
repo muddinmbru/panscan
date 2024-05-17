@@ -26,14 +26,14 @@ use -a, -n, -s to redefine the parameters for a complex site.
 ### Complex regions
 Complex regions are regions of 100Kb with atleast one complex site and another SV. To list complex regions use the --regions flag with
 ```panscan complex``` subcommand
--l can be used to define the length of the region
---sites can be used to define how many sites should be present
---sv can be used to define how many secondary SVs should be present
+```-l``` can be used to define the length of the region
+```--sites``` can be used to define how many sites should be present
+```--sv``` can be used to define how many secondary SVs should be present
 
 for a region to be considered complex.
 
 ### End-to-end
-Run the **panscan complex** to run the command in full to produce complex regions and haplotype walks for each sample in all the regions. 
+Run the ```panscan complex``` to run the command in full to produce complex regions and haplotype walks for each sample in all the regions. 
 
 ## Gene-duplication analyses
 
