@@ -21,7 +21,7 @@ The complex sites, as defined in the Arab Pangenome paper, are the sites with mo
 panscan complex --list -a 5 -n1 -s 10000
 ```
 
-use -a, -n, -s to redefine the parameters for a complex site. 
+use ```-a```, ```-n```, ```-s``` to redefine the parameters for a complex site. 
 
 ### Complex regions
 Complex regions are regions of 100Kb with atleast one complex site and another SV. To list complex regions use the --regions flag with
