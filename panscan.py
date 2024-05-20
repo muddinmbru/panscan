@@ -18,33 +18,117 @@ import numpy as np
 import argparse
 import subprocess
 
-def run_panscan_complex(vcf_file, a, n, s, region_length, sites, sv):
-    """
-    Runs the panscan complex command to list complex sites and regions.
-    """
-    try:
-        # List complex sites
-        list_complex_sites_cmd = f"panscan complex --list -a {a} -n {n} -s {s} {vcf_file}"
-        subprocess.run(list_complex_sites_cmd, shell=True, check=True)
+def call_novel_seq(vcf1, vcf2):
+    os.system(f"perl findNovelSeq.pl {vcf1} {vcf2}")
         
-        # List complex regions
-        list_complex_regions_cmd = f"panscan complex --regions -l {region_length} --sites {sites} --sv {sv} {vcf_file}"
-        subprocess.run(list_complex_regions_cmd, shell=True, check=True)
         
-        # End-to-end command
-        end_to_end_cmd = f"panscan complex {vcf_file}"
-        subprocess.run(end_to_end_cmd, shell=True, check=True)
+def call_variant_analysis(vcf):
+    os.system(f"perl preprocessVCF.pl {vcf}")
+
+def process_and_plot_data(result_file):
+    # Load data
+    result_df = pd.read_csv(result_file, index_col=0)
+    hprc = pd.read_csv('hprc-matrix.csv', skipfooter=1, engine='python', index_col=0)
+    cpc = pd.read_csv('cpc-matrix.csv', index_col=0)
+    cpc = cpc.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'])
+    
+    # Plotting duplications
+    duplicates_count = (result_df != 0).sum()
+    duplicates_count = duplicates_count.sort_values()
+    plt.figure(figsize=(40, 24))
+    duplicates_count.plot(kind='bar', color='#1F1F6A', edgecolor='black')
+    plt.xlabel('Genome by number of duplications')
+    plt.ylabel('Duplicated genes per genome')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.xticks(rotation=0, color='white', ha='right')
+    plt.tight_layout()
+    plt.savefig('genome-by-dup.png')
+    plt.show()
+
+    # Venn diagram
+    #common_indices = hprc.index.intersection(result_df.index).intersection(cpc.index)
+    #venn_data = {
+    #    '100': len(hprc.index.difference(result_df.index).difference(cpc.index)),
+    #    '010': len(result_df.index.difference(hprc.index).difference(cpc.index)),
+    #    '001': len(cpc.index.difference(hprc.index).difference(result_df.index)),
+    #    '110': len(hprc.index.intersection(result_df.index).difference(cpc.index)),
+    #    '101': len(hprc.index.difference(result_df.index).intersection(cpc.index)),
+    #    '011': len(result_df.index.difference(hprc.index).intersection(cpc.index)),
+    #    '111': len(common_indices)
+    #}
+    #plt.figure(figsize=(40, 40))
+    #venn = venn3(subsets=venn_data, set_labels=('HPRC', 'APR', 'CPC'))
+    #for text in venn.set_labels:
+    #    text.set_fontsize(80)
+    #for text in venn.subset_labels:
+    #    text.set_fontsize(60)
+    #plt.savefig('venn-comparison.png')
+    #plt.show()
+    
+    # Venn diagram
+    common_indices = hprc.index.intersection(result_df.index).intersection(cpc.index)
+    venn_data = {
+        '100': len(hprc.index.difference(result_df.index).difference(cpc.index)),
+        '010': len(result_df.index.difference(hprc.index).difference(cpc.index)),
+        '001': len(cpc.index.difference(hprc.index).difference(result_df.index)),
+        '110': len(hprc.index.intersection(result_df.index).difference(cpc.index)),
+        '101': len(hprc.index.difference(result_df.index).intersection(cpc.index)),
+        '011': len(result_df.index.difference(hprc.index).intersection(cpc.index)),
+        '111': len(common_indices)
+    }
+    plt.figure(figsize=(40, 40))
+    venn = venn3(subsets=venn_data, set_labels=('HPRC', 'APR', 'CPC'))
+
+    # Update font size for the Venn diagram labels
+    for text in venn.set_labels:
+        if text:  # Check if the label exists
+            text.set_fontsize(80)
+    if venn.subset_labels:  # Check if subset labels exist
+        for text in venn.subset_labels:
+            if text:  # Check if the subset label exists
+                text.set_fontsize(60)
+    plt.savefig('venn-comparison.png')
+    plt.show()
+
+    # Frequency comparison for each category
+    def frequency_comparison(df1, df2, output_file, label1, label2):
+        df1_freq = df1.apply(lambda row: (row != 0).sum() / len(row), axis=1).to_frame(name='Frequency_x')
+        df2_freq = df2.apply(lambda row: (row != 0).sum() / len(row), axis=1).to_frame(name='Frequency_y')
         
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred while running panscan complex: {e}")
+        comparison_df = df1_freq.merge(df2_freq, left_index=True, right_index=True)
+        comparison_df['Absolute_Difference'] = abs(comparison_df['Frequency_x'] - comparison_df['Frequency_y'])
+        comparison_df['Percentage_Difference'] = (comparison_df['Absolute_Difference'] / comparison_df[['Frequency_x', 'Frequency_y']].max(axis=1)) * 100
+        
+        filtered_df = comparison_df[comparison_df['Percentage_Difference'] >= 5]
+        sorted_df = filtered_df.sort_values(by='Percentage_Difference', ascending=False)
+        top_5_diff = sorted_df.head(5)
+        
+        plt.figure(figsize=(40, 36))
+        plt.barh(top_5_diff.index, top_5_diff['Frequency_x'], color='#1F1F6A', label=label1)
+        plt.barh(top_5_diff.index, -top_5_diff['Frequency_y'], color='#EA4E15', label=label2)
+        plt.xlabel('CNV frequency', labelpad=50)
+        plt.legend()
+        plt.rcParams['font.size'] = 70
+        plt.tight_layout(pad=4)
+        plt.savefig(output_file)
+        plt.show()
+
+    # Plot frequency comparison with CPC
+    frequency_comparison(result_df, cpc, 'frequency-comparsion-with-cpc.png', 'Result', 'CPC')
+
+    # Plot frequency comparison with HPRC
+    frequency_comparison(result_df, hprc, 'frequency-comparsion-with-hprc.png', 'Result', 'HPRC')
+
+
 
 def run_variant_analysis(vcf_file):
     """
     Runs the panscan variant_analysis command.
     """
     try:
-        variant_analysis_cmd = f"panscan variant_analysis {vcf_file}"
-        subprocess.run(variant_analysis_cmd, shell=True, check=True)
+        # variant_analysis_cmd = f"panscan variant_analysis {vcf_file}"
+        # subprocess.run(variant_analysis_cmd, shell=True, check=True)
+        call_variant_analysis(vcf_file)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running panscan variant_analysis: {e}")
 
@@ -53,8 +137,7 @@ def run_gene_dup(csv_file):
     Runs the panscan gene_dup command.
     """
     try:
-        gene_dup_cmd = f"panscan gene_dup {csv_file}"
-        subprocess.run(gene_dup_cmd, shell=True, check=True)
+        process_and_plot_data(csv_file)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running panscan gene_dup: {e}")
 
@@ -63,8 +146,7 @@ def run_panscan_novel_seq(vcf1, vcf2):
     Runs the panscan novel_seq command.
     """
     try:
-        novel_seq_cmd = f"panscan novel_seq {vcf1} {vcf2}"
-        subprocess.run(novel_seq_cmd, shell=True, check=True)
+        call_novel_seq(vcf1, vcf2)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running panscan novel_seq: {e}")
 
@@ -93,7 +175,7 @@ def main():
     variant_analysis_parser = subparsers.add_parser("variant_analysis", help="Perform variant analysis on a VCF file.")
     variant_analysis_parser.add_argument("vcf_file", help="Path to the VCF file for variant analysis.")
     variant_analysis_parser.add_argument("--output", help="Output directory to save the results.")
-    variant_analysis_parser.add_argument("--")
+
     
     # Gene duplication command
     gene_dup_parser = subparsers.add_parser("gene_dup", help="Detect gene duplications from a CSV file.")
@@ -107,6 +189,8 @@ def main():
         run_variant_analysis(args.vcf_file)
     elif args.command == "gene_dup":
         run_gene_dup(args.csv_file)
+    elif args.command == "novel_seq":
+        run_panscan_novel_seq(args.vcf1, args.vcf2)
     else:
         parser.print_help()
 
@@ -117,7 +201,7 @@ if __name__ == "__main__":
 # Find complex regions
 # print('running panscan ')
 # %%
-vcf_file = 'apr_review_v1_2902_chm13.vcf'
+# vcf_file = 'apr_review_v1_2902_chm13.vcf'
 
 # %%
 def extract_info(info_str, key):
@@ -168,7 +252,7 @@ def get_interesting_sites(vcf_file):
     return interesting_sites
 
 # %%
-interesting_sites = get_interesting_sites(vcf_file)
+# interesting_sites = get_interesting_sites(vcf_file)
 
 # %%
 def get_df(sites):
@@ -178,31 +262,31 @@ def get_df(sites):
     
     return pd.DataFrame(data, columns=['chrom', 'pos'])
 
-site_df = get_df(interesting_sites)
+# site_df = get_df(interesting_sites)
+
+# # %%
+# all_sites_df = get_all_sv_sites(vcf_file)
 
 # %%
-all_sites_df = get_all_sv_sites(vcf_file)
-
-# %%
-all_sites_df[1] = pd.to_numeric(all_sites_df[1])
+# all_sites_df[1] = pd.to_numeric(all_sites_df[1])
 
 # %%
 
-window_size = 50000
-regions = []
-for i,site in site_df.iterrows():
+# window_size = 50000
+# regions = []
+# for i,site in site_df.iterrows():
 
-    chrom = site['chrom']
-    pos = site['pos']
+#     chrom = site['chrom']
+#     pos = site['pos']
 
-    sites_in_window = all_sites_df.loc[(all_sites_df[0] == chrom ) & (all_sites_df[1]>pos-window_size) & (all_sites_df[1]<pos+window_size)]
+#     sites_in_window = all_sites_df.loc[(all_sites_df[0] == chrom ) & (all_sites_df[1]>pos-window_size) & (all_sites_df[1]<pos+window_size)]
     
-    if sites_in_window.shape[0] >= 2:
-        regions.append([chrom, pos-window_size, pos+window_size])
+#     if sites_in_window.shape[0] >= 2:
+#         regions.append([chrom, pos-window_size, pos+window_size])
         
 
 # %%
-window_size = 100000
+# window_size = 100000
 
 def get_complex_regions(window_size): 
     regions = []
@@ -232,7 +316,7 @@ def get_complex_regions(window_size):
 # Find all the genes in these regions
 
 # %%
-gff3_file = 'chm13_genomic_chr.gff3'
+# gff3_file = 'chm13_genomic_chr.gff3'
 
 def extract_genes_from_gff3(filename):
     genes = []
@@ -259,7 +343,7 @@ def extract_genes_from_gff3(filename):
 
 
 # %%
-all_genes_df = pd.DataFrame(extract_genes_from_gff3(gff3_file))
+# all_genes_df = pd.DataFrame(extract_genes_from_gff3(gff3_file))
 
 # %%
 def get_region_genes(regions, gene_df):
@@ -278,20 +362,20 @@ def get_region_genes(regions, gene_df):
 
 
 # %%
-region_genes = get_region_genes(regions, all_genes_df)
+# region_genes = get_region_genes(regions, all_genes_df)
 
-# %%
-region_genes['pc_gene_list'] = region_genes['pc_genes'].apply(lambda x: x.split(','))
+# # %%
+# region_genes['pc_gene_list'] = region_genes['pc_genes'].apply(lambda x: x.split(','))
 
-# %%
-filtered_region_genes = region_genes[region_genes['pc_gene_list'].apply(len) >= 2]
-filtered_region_genes = filtered_region_genes['chr	start	end	all_genes	pc_genes'.split('\t')]
+# # %%
+# filtered_region_genes = region_genes[region_genes['pc_gene_list'].apply(len) >= 2]
+# filtered_region_genes = filtered_region_genes['chr	start	end	all_genes	pc_genes'.split('\t')]
 
-# %% [markdown]
-# find regions that have more than one haplotypes
+# # %% [markdown]
+# # find regions that have more than one haplotypes
 
-# %%
-regions = [tuple(row) for row in filtered_region_genes[['chr', 'start', 'end']].itertuples(index=False, name=None)]
+# # %%
+# regions = [tuple(row) for row in filtered_region_genes[['chr', 'start', 'end']].itertuples(index=False, name=None)]
 
 # %%
 def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, start, end, query_region, workdir, gene_alignments, df_all):
@@ -544,79 +628,5 @@ def call_novel_seq(vcf1, vcf2):
         
         
 def call_variant_analysis(vcf):
-    subprocess.call(f"perl preprocessVCF.pl {vcf}")
+    subprocess.run(f"perl preprocessVCF.pl {vcf}")
 
-def call_gene_dup(csv):
-    result_file = 'gene_dup.results'
-    result_df = pd.read_csv(result_file, index_col=0)
-    hprc = pd.read_csv('hprc-matrix.csv', skipfooter=1, engine='python', index_col=0)
-    cpc = pd.read_csv('cpc-matrix.csv', index_col=0)
-    cpc = cpc.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'])
-    
-    # Plotting duplications
-    duplicates_count = (result_df != 0).sum()
-    duplicates_count = duplicates_count.sort_values()
-    plt.figure(figsize=(40, 24))
-    duplicates_count.plot(kind='bar', color='#1F1F6A', edgecolor='black')
-    plt.xlabel('Genome by number of duplications')
-    plt.ylabel('Duplicated genes per genome')
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.xticks(rotation=0, color='white', ha='right')
-    plt.tight_layout()
-    plt.savefig('genome-by-dup.png')
-    plt.show()
-
-
-    common_indices = hprc.index.intersection(result_df.index).intersection(cpc.index)
-    venn_data = {
-        '100': len(hprc.index.difference(result_df.index).difference(cpc.index)),
-        '010': len(result_df.index.difference(hprc.index).difference(cpc.index)),
-        '001': len(cpc.index.difference(hprc.index).difference(result_df.index)),
-        '110': len(hprc.index.intersection(result_df.index).difference(cpc.index)),
-        '101': len(hprc.index.difference(result_df.index).intersection(cpc.index)),
-        '011': len(result_df.index.difference(hprc.index).intersection(cpc.index)),
-        '111': len(common_indices)
-    }
-    plt.figure(figsize=(40, 40))
-    venn = venn3(subsets=venn_data, set_labels=('HPRC', 'APR', 'CPC'))
-
-    # Update font size for the Venn diagram labels
-    for text in venn.set_labels:
-        if text:  # Check if the label exists
-            text.set_fontsize(80)
-    if venn.subset_labels:  # Check if subset labels exist
-        for text in venn.subset_labels:
-            if text:  # Check if the subset label exists
-                text.set_fontsize(60)
-    plt.savefig('venn-comparison.png')
-    plt.show()
-
-    # Frequency comparison for each category
-    def frequency_comparison(df1, df2, output_file, label1, label2):
-        df1_freq = df1.apply(lambda row: (row != 0).sum() / len(row), axis=1).to_frame(name='Frequency_x')
-        df2_freq = df2.apply(lambda row: (row != 0).sum() / len(row), axis=1).to_frame(name='Frequency_y')
-        
-        comparison_df = df1_freq.merge(df2_freq, left_index=True, right_index=True)
-        comparison_df['Absolute_Difference'] = abs(comparison_df['Frequency_x'] - comparison_df['Frequency_y'])
-        comparison_df['Percentage_Difference'] = (comparison_df['Absolute_Difference'] / comparison_df[['Frequency_x', 'Frequency_y']].max(axis=1)) * 100
-        
-        filtered_df = comparison_df[comparison_df['Percentage_Difference'] >= 5]
-        sorted_df = filtered_df.sort_values(by='Percentage_Difference', ascending=False)
-        top_5_diff = sorted_df.head(5)
-        
-        plt.figure(figsize=(40, 36))
-        plt.barh(top_5_diff.index, top_5_diff['Frequency_x'], color='#1F1F6A', label=label1)
-        plt.barh(top_5_diff.index, -top_5_diff['Frequency_y'], color='#EA4E15', label=label2)
-        plt.xlabel('CNV frequency', labelpad=50)
-        plt.legend()
-        plt.rcParams['font.size'] = 70
-        plt.tight_layout(pad=4)
-        plt.savefig(output_file)
-        plt.show()
-
-    # Plot frequency comparison with CPC
-    frequency_comparison(result_df, cpc, 'frequency-comparsion-with-cpc.png', 'Result', 'CPC')
-
-    # Plot frequency comparison with HPRC
-    frequency_comparison(result_df, hprc, 'frequency-comparsion-with-hprc.png', 'Result', 'HPRC')
-    
