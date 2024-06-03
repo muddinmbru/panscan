@@ -109,6 +109,7 @@ def process_and_plot_data(result_file):
         plt.xlabel('CNV frequency', labelpad=50)
         plt.legend()
         plt.rcParams['font.size'] = 70
+
         plt.tight_layout(pad=4)
         plt.savefig(output_file)
         plt.show()
@@ -150,11 +151,109 @@ def run_panscan_novel_seq(vcf1, vcf2):
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running panscan novel_seq: {e}")
 
+def extract_info(info_str, key):
+    for field in info_str.split(';'):
+        if field.startswith(key + '='):
+            return field[len(key)+1:]
+    return None
+
+def allele_lengths(ref, alt):
+    alts = alt.split(',')
+    return [len(a) for a in alts]
+
+def get_interesting_alleles(vcf_file, n_10kb, site_size):
+    if n_10kb == None:
+        n_10kb = 5
+    if site_size == None:
+        site_size=10000
+
+    interesting_alleles = []
+    with open(vcf_file, 'r') as vcf:
+        for line in vcf:
+            if not line.startswith('#'):  # Exclude header lines
+                columns = line.strip().split('\t')
+                ref = columns[3]
+                alt = columns[4]
+                
+                lengths = allele_lengths(ref, alt)
+
+                if len(lengths) >= n_10kb and any((l-len(ref)) > site_size for l in lengths):
+                    interesting_alleles.append(line.strip())
+
+    return interesting_alleles
+
+def get_df(sites):
+    data = []
+    for site in sites:
+        data.append((site.split()[0], int(site.split()[1])))
+    
+    return pd.DataFrame(data, columns=['chrom', 'pos'])
+
+
+
+def find_complex_sites(vcf_file, n_10kb, site_size):
+    interesting_alleles = get_interesting_alleles(vcf_file, n_10kb, site_size)
+    locations = [(allele.split()[0], allele.split()[1]) for allele in interesting_alleles]
+    regions = [(region[0], int(region[1] )- 10000, int(region[1]) + 10000) for region in locations]
+
+    site_df = get_df(interesting_alleles)
+
+    return site_df
+
+def find_interesting_regions(site_df, window_size):
+    if window_size == None:
+        window_size = 100000
+
+    regions = []
+    for chrom in site_df['chrom'].unique():
+        temp_df = site_df.loc[site_df['chrom'] == chrom]
+        max_position = temp_df['pos'].max()
+        min_position = temp_df['pos'].min()
+        
+        ptr = min_position
+        end = max_position
+        
+        
+        
+        while ptr < end:
+            sites_in_window = temp_df.loc[(temp_df['pos']>ptr) & (temp_df['pos']<ptr+window_size)]
+            if sites_in_window.shape[0] >= 2:
+                regions.append((chrom, ptr, ptr+window_size))
+                
+            ptr += window_size
+
+    return regions
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+def run_panscan_complex(vcf_file, alleles, n_10kb, site_size, complex_region_length, number_complex_sites, number_sv):
+    
+    site_df = find_complex_sites(vcf_file, n_10kb, site_size)
+    complex_regeions = find_interesting_regions(site_df, complex_region_length)
+
+
+
+
+
+    
+
 def main():
     parser = argparse.ArgumentParser(description="Panscan tool to analyze complex loci, perform variant analysis, and gene duplication detection.")
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
+
     # Complex command
     complex_parser = subparsers.add_parser("complex", help="Analyze complex loci from a VCF file.")
     complex_parser.add_argument("vcf_file", help="Path to the VCF file generated from Minigraph-cactus pipeline.")
@@ -346,7 +445,7 @@ def extract_genes_from_gff3(filename):
 # all_genes_df = pd.DataFrame(extract_genes_from_gff3(gff3_file))
 
 # %%
-def get_region_genes(regions, gene_df):
+def get_region_genes(regions, all_genes_df):
     region_genes = []
     for chr, start,end in regions:
         chr_genes = all_genes_df.loc[(all_genes_df[0] == chr) & (all_genes_df[1] >= start) & (all_genes_df[2] <= end)]
@@ -361,21 +460,6 @@ def get_region_genes(regions, gene_df):
     return pd.DataFrame(region_genes, columns=['chr','start','end', 'all_genes', 'pc_genes'])
 
 
-# %%
-# region_genes = get_region_genes(regions, all_genes_df)
-
-# # %%
-# region_genes['pc_gene_list'] = region_genes['pc_genes'].apply(lambda x: x.split(','))
-
-# # %%
-# filtered_region_genes = region_genes[region_genes['pc_gene_list'].apply(len) >= 2]
-# filtered_region_genes = filtered_region_genes['chr	start	end	all_genes	pc_genes'.split('\t')]
-
-# # %% [markdown]
-# # find regions that have more than one haplotypes
-
-# # %%
-# regions = [tuple(row) for row in filtered_region_genes[['chr', 'start', 'end']].itertuples(index=False, name=None)]
 
 # %%
 def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, start, end, query_region, workdir, gene_alignments, df_all):
