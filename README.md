@@ -9,7 +9,7 @@ Matplotlib
 perl
 pandas
 [GFABase](https://github.com/mlin/gfabase) must be installed and be accessible in the shell.
-[Bandage](https://github.com/rrwick/Bandage) should be installed and added to the path for plotting.
+[Bandage](https://github.com/rrwick/Bandage) should be installed and added to the path for plotting
 
 ## Installation
 To use Panscan, clone the respository and add it to your path.
