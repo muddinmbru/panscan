@@ -325,7 +325,7 @@ def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output
 
     return result
 
-def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfab, ref, ref_fasta, gaf, sep, gff3_file):
+def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab, ref, ref_fasta, gaf, sep, gff3_file):
     print(f"Running complex with vcf_file={vcf_file}, a={a}, n={n}, s={s}, l={l}, sites={sites}, sv={sv}")
     site_df = find_complex_sites(vcf_file, n, s)
     complex_regions = find_interesting_regions(site_df, l)
@@ -336,6 +336,10 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfab, ref, ref_fasta, g
 
 
     print('reading alignments')
+    
+    if not os.path.exists(gaf):
+        os.system(f'GraphAligner -g {gfa} -f {gene_seq_fa} -t 2 -a {gaf} -x vg --multimap-score-fraction 0.1')
+    
     # %%
     df_arp = pd.read_csv(gaf, sep = '\t', header=None)
     df_arp[0] = df_arp[0].str.split('_', expand = True)[0].str.split('-', expand=True).iloc[:, 1:].fillna('').apply('-'.join, axis = 1).str.strip('-')
@@ -344,7 +348,6 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfab, ref, ref_fasta, g
     # df_cpc = pd.read_csv('chm13.genes.cpc.gaf', sep = '\t', header=None)
     # df_cpc[0] = df_cpc[0].str.split('_', expand = True)[0].str.split('-', expand=True).iloc[:, 1:].fillna('').apply('-'.join, axis = 1).str.strip('-')
 
-    print('read_data')
 
     # %%
     tasks = []
@@ -384,6 +387,10 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfab, ref, ref_fasta, g
         
             tasks.append((gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, int(start), int(end), query_region, workdir, gene_alignments, df_all))
 
+    
+    for task in tasks:
+        produce_plottable(*task)
+            
 
 
 
