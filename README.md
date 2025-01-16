@@ -16,7 +16,7 @@ To use Panscan, clone the respository and add it to your path.
 
 ## Complex loci analyses 
 The complex loci can be anlayzed from the vcf file generated from [Minigraph-cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md) pipeline. 
-The complex sites, as defined in the Arab Pangenome paper, are the sites with more than 5 alleles and atleast 1 10kb variant. To list all of the complex sites with the preceding definition run
+The complex sites, as defined in the Arab Pangenome paper, are the sites with more than 5 alleles and atleast one 10kb variant. To list all of the complex sites with the preceding definition run
 ```
 panscan complex --list -a 5 -n1 -s 10000
 ```
