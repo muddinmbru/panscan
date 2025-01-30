@@ -438,7 +438,6 @@ def add_subparser(subparsers):
     parser = subparsers.add_parser("complex", help="Analyze complex loci from a VCF file.")
     parser.add_argument("vcf_file", help="Path to the VCF file generated from Minigraph-cactus pipeline.")
     parser.add_argument("gfab_file", help="Path to the gfab file generated from the GFA file")
-    parser.add_argument("--ref_pattern", default=None, help="Pattern for the reference in the GFA file")
     parser.add_argument("--ref_fasta", help="Path to the reference file" )
     parser.add_argument("--gaf_file", help="Path to the gene alignments to the graph in GAF format")
     parser.add_argument("--sep_pattern", help="Separator for the sample and the sequence as present in GAF file (eg. '#')")
