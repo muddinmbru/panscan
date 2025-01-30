@@ -7,14 +7,14 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     # Add subcommands
     complex.add_subparser(subparsers)
-    preprocess_vcf.add_subparser(subparsers)
+    preprocess_vcf.add_subparser(subparsers)  # This calls the add_subparser function in preprocess_vcf.py
     findUniqVariants.add_subparser(subparsers)
     make_dup_mtx.add_subparser(subparsers)
     gene_dup.add_subparser(subparsers)
 
     args = parser.parse_args()
     if hasattr(args, 'func'):
-        args.func(args)
+        args.func(args)  # Executes the function corresponding to the subcommand
     else:
         parser.print_help()
 
