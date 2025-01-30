@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='panscan',
-    version='0.2',
+    version='0.3.2',
     packages=find_packages(),
-    scripts=['scripts/findNovelSeq.pl', 'scripts/preprocessVCF.pl'],
+    scripts=['scripts/preprocessVCF.pl', 'scripts/findUniqVariants.pl'],
     entry_points={
         'console_scripts': [
-            'panscan=panscan.__main__:main',
+            'scanpy=scanpy.__main__:main',
         ],
     },
     install_requires=[
