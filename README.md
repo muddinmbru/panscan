@@ -14,6 +14,15 @@ pandas
 ## Installation
 To use Panscan, clone the respository and add it to your path.
 
+After cloning, enter the repository and run the comman 
+
+```pip install .```
+
+After successful installation run the tool with
+
+```python -m panscan -h```
+
+
 ## Complex loci analyses 
 The complex loci can be anlayzed from the vcf file generated from [Minigraph-cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md) pipeline. 
 The complex sites, as defined in the Arab Pangenome paper, are the sites with more than 5 alleles and atleast one 10kb variant. To list all of the complex sites with the preceding definition run
