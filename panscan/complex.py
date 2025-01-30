@@ -81,12 +81,22 @@ def find_interesting_regions(site_df, window_size):
 
 
 
-def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, start, end, query_region, workdir, gene_alignments, df_all):
+def produce_plottable(*task):
+    gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, start, end, query_region, workdir, gene_alignments, df_all, sep_pattern = task
+    
     Path(workdir).mkdir(parents=True, exist_ok=True)
-    connected_command = f'gfabase sub {gfab} -o {connected_output} {query_region} --range --cutpoints {cutpoints} --view --connected'
-    viz_command = f'gfabase sub {gfab} -o {viz_output} {query_region} --range --view --cutpoints {cutpoints}'
-
+    
+    # Modify query region to match gfabase requirements
+    modified_query_region = f'{ref}{sep_pattern}{chrom}:{start}-{end}'
+    
+    connected_command = f'gfabase sub {gfab} -o {connected_output} {modified_query_region} --range --cutpoints {cutpoints} --view --connected'
+    viz_command = f'gfabase sub {gfab} -o {viz_output} {modified_query_region} --range --view --cutpoints {cutpoints}'
+    
     print(connected_command)
+    print(viz_command)
+    
+    os.system(connected_command)
+    os.system(viz_command)
     def run_command(command_string):
         cmd = command_string.split(' ')
         try:
@@ -187,7 +197,13 @@ def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output
     
     
     def get_segement_colors_from_alignment(df_all, section_genes, color_files_dir):
-
+        #####debug zome
+        print(df_all)
+        print("Section genes:", section_genes)
+        print("Initial df_all shape:", df_all.shape)
+        #####
+        df_all = df_all[(df_all[0].isin(section_genes)) & (df_all[11] > 0)]
+        print("Filtered df_all shape:", df_all.shape)    
         df_all = df_all[(df_all[0].isin(section_genes)) & (df_all[11] > 0)]
 
         df_all['index'] = df_all.groupby(0).cumcount() + 1
@@ -325,25 +341,29 @@ def produce_plottable(gfab, gff3_file, region, cutpoints, graph_base, viz_output
 
     return result
 
-def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab, ref, ref_fasta, gaf, sep, gff3_file):
+def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfab, ref_fasta, gaf, sep_pattern, gff3_file, ref_name=None):
+    if ref_name is None:
+        ref_name = os.path.splitext(os.path.basename(ref_fasta))[0]
+
+
     print(f"Running complex with vcf_file={vcf_file}, a={a}, n={n}, s={s}, l={l}, sites={sites}, sv={sv}")
     site_df = find_complex_sites(vcf_file, n, s)
     complex_regions = find_interesting_regions(site_df, l)
  
     pd.DataFrame(complex_regions).to_csv("complex_regions.csv")
-
     graphs = [gfab]
-
-
     print('reading alignments')
     
+        
     if not os.path.exists(gaf):
-        os.system(f'GraphAligner -g {gfa} -f {gene_seq_fa} -t 2 -a {gaf} -x vg --multimap-score-fraction 0.1')
+        os.system(f'GraphAligner -g {gfab} -f {gene_seq_fa} -t 2 -a {gaf} -x vg --multimap-score-fraction 0.1')
     
     # %%
     df_arp = pd.read_csv(gaf, sep = '\t', header=None)
-    df_arp[0] = df_arp[0].str.split('_', expand = True)[0].str.split('-', expand=True).iloc[:, 1:].fillna('').apply('-'.join, axis = 1).str.strip('-')
+    print(df_arp[0].head())
 
+    df_arp[0] = df_arp[0].str.split('_', expand = True)[0].str.split('-', expand=True).iloc[:, 1:].fillna('').apply('-'.join, axis = 1).str.strip('-')
+    print(df_arp[0].head())
     # %%
     # df_cpc = pd.read_csv('chm13.genes.cpc.gaf', sep = '\t', header=None)
     # df_cpc[0] = df_cpc[0].str.split('_', expand = True)[0].str.split('-', expand=True).iloc[:, 1:].fillna('').apply('-'.join, axis = 1).str.strip('-')
@@ -355,7 +375,7 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab,
         for chrom,start,end in complex_regions:
         
             # gfab = 'hprc-v2.1-mc-chm13.gfab'
-            gff3_file = "chm13v2.0_RefSeq_Liftoff_v5.1.gff3"
+            #gff3_file = "chm13v2.0_RefSeq_Liftoff_v5.1.gff3"
             fasta_file = ref_fasta
  
             region = 'complex'
@@ -375,9 +395,9 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab,
             
             
             
-            query_region = f'{ref}{sep}{chrom}:{start}-{end}'
+            query_region = f'{ref_name}{sep_pattern}{chrom}:{start}-{end}'
 
-            region = f'{chrom}{sep}{start}_{end}'
+            region = f'{chrom}{sep_pattern}{start}_{end}'
 
             workdir = f'all_plottables/{graph_base}.{region}.wd'
             viz_output = f'{workdir}/{region}.{cutpoints}.{graph_base}.gfa'
@@ -385,7 +405,7 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab,
         
             os.system('mkdir -p all_walks_gfas')
         
-            tasks.append((gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref, chrom, int(start), int(end), query_region, workdir, gene_alignments, df_all))
+            tasks.append((gfab, gff3_file, region, cutpoints, graph_base, viz_output, connected_output, ref_name, chrom, int(start), int(end), query_region, workdir, gene_alignments, df_all, sep_pattern))
 
     
     for task in tasks:
@@ -398,18 +418,31 @@ def run_panscan_complex(vcf_file, a, n, s, l, sites, sv, gfa, gene_seq_fa, gfab,
     
 
 def main(args):
-    run_panscan_complex(args.vcf_file, args.a, args.n, args.s, args.l, args.sites, args.sv, args.gfab_file, args.ref_pattern, args.ref_fasta, args.gaf_file, args.sep_pattern, args.gff3)
+    run_panscan_complex(
+        args.vcf_file, 
+        args.a, 
+        args.n, 
+        args.s, 
+        args.l, 
+        args.sites, 
+        args.sv, 
+        args.gfab_file, 
+        args.ref_fasta, 
+        args.gaf_file, 
+        args.sep_pattern, 
+        args.gff3,
+        ref_name=args.ref_name
+            )
 
 def add_subparser(subparsers):
     parser = subparsers.add_parser("complex", help="Analyze complex loci from a VCF file.")
-
-
     parser.add_argument("vcf_file", help="Path to the VCF file generated from Minigraph-cactus pipeline.")
     parser.add_argument("gfab_file", help="Path to the gfab file generated from the GFA file")
-    parser.add_argument("--ref_pattern", help="Pattern for the reference in the GFA file")
+    parser.add_argument("--ref_pattern", default=None, help="Pattern for the reference in the GFA file")
+    parser.add_argument("--gene_seq_fa", default=None, help="Path to gene sequence FASTA file")
     parser.add_argument("--ref_fasta", help="Path to the reference file" )
     parser.add_argument("--gaf_file", help="Path to the gene alignments to the graph in GAF format")
-    parser.add_argument('--sep_pattern', help='Separator for the sample and the sequence')
+    parser.add_argument("--sep_pattern", help="Separator for the sample and the sequence as present in GAF file (eg. '#')")
     parser.add_argument('--gff3', help='Path to the gff3 file')
     parser.add_argument("-a", type=int, default=5, help="Number of alleles to define a complex site (default: 5).")
     parser.add_argument("-n", type=int, default=1, help="Number of 10kb variants to define a complex site (default: 1).")
@@ -418,9 +451,11 @@ def add_subparser(subparsers):
     parser.add_argument("-l", type=int, default=100000, help="Length of the region to define a complex region (default: 100000).")
     parser.add_argument("--sites", type=int, default=1, help="Number of complex sites in a region to define it as complex (default: 1).")
     parser.add_argument("--sv", type=int, default=1, help="Number of secondary SVs in a region to define it as complex (default: 1).")
-   
+    parser.add_argument("--ref_name", default=None, help="Reference name to use in region queries as present in GAF file (eg. CHM13)(default: None)")
     parser.set_defaults(func=main)
 
 
 
 
+
+# %%
