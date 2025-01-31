@@ -6,13 +6,17 @@ def run_find_uniq_variants(vcf, var_type, db, overlap, output):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Construct the absolute path to findUniqVariants.pl
-    perl_script = os.path.join(script_dir, "..", "scripts", "perlModules", "findUniqVariants.pl")
+    perl_script = os.path.join(script_dir, "..", "scripts",  "findUniqVariants.pl")
     
     # Normalize the path
     perl_script = os.path.abspath(perl_script)
 
-    # Debugging print (optional)
+    # Locate perlModules dynamically (assumes it's in the same dir as findUniqVariants.pl)
+    perl_modules = os.path.join(script_dir, "..", "scripts", "perlModules")
+
+    # Debugging prints (optional)
     print(f"Running Perl script at: {perl_script}")
+    print(f"Using Perl module path: {perl_modules}")
 
     # Constructing the command based on input arguments
     cmd = [
@@ -26,7 +30,7 @@ def run_find_uniq_variants(vcf, var_type, db, overlap, output):
         cmd += ['--output', output]  # Optional output directory
 
     # Run the Perl script
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, check=True, env=env)
 
 def main(args):
     run_find_uniq_variants(args.vcf_file, args.var_type, args.db, args.overlap, args.output)
