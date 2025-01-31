@@ -6,6 +6,8 @@ use perlModules::panscan qw(cleanUp print_help1);
 use Cwd;
 my $currpath = getcwd();
 use lib '$currpath';
+use FindBin;
+use File::Spec;
 
 #BEGIN#######################################################
 # Version:   1.0
@@ -25,7 +27,10 @@ use lib '$currpath';
 ##############################################################
 
 # Specify the path to the config file
-my $config_file = $currpath."/config.yaml";
+my $script_dir = $FindBin::Bin;
+
+# Construct the full path to the config.yaml file
+my $config_file = File::Spec->catfile($script_dir, 'config.yaml');
 
 # Check if the config file exists
 if(!-e $config_file)
