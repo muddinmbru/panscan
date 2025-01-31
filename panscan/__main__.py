@@ -1,5 +1,5 @@
 import argparse
-from . import complex, preprocess_vcf, findUniqVariants, make_dup_mtx, gene_dup
+from . import complex, preprocess_vcf, novel_seq, findUniqVariants, make_dup_mtx, gene_dup
 
 def main():
     parser = argparse.ArgumentParser(description="Panscan tool to analyze complex loci, perform variant analysis, and gene duplication detection.")
@@ -7,7 +7,8 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     # Add subcommands
     complex.add_subparser(subparsers)
-    preprocess_vcf.add_subparser(subparsers)  # This calls the add_subparser function in preprocess_vcf.py
+    preprocess_vcf.add_subparser(subparsers)
+    novel_seq.add_subparser(subparsers)
     findUniqVariants.add_subparser(subparsers)
     make_dup_mtx.add_subparser(subparsers)
     gene_dup.add_subparser(subparsers)
