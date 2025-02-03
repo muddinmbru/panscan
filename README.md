@@ -20,7 +20,7 @@ After cloning, enter the repository and run the comman
 
 After successful installation run the tool with
 
-```python -m panscan -h```
+``panscan```
 
 
 ## Complex loci analyses 
