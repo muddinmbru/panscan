@@ -1,9 +1,8 @@
-  GNU nano 4.8                                                                                                      setup.py                                                                                                                 
 from setuptools import setup, find_packages
 
 setup(
     name="panscan",
-    version="0.3.2",
+    version="1.0",
     packages=find_packages(),
     package_data={
         "panscan": [
@@ -17,7 +16,4 @@ setup(
             "panscan=panscan.__main__:main",  # Assuming you have a `__main__.py` in `panscan/`
         ],
     },
-    install_requires=[
-        "pandas",
-    ],
 )
