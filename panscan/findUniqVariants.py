@@ -67,7 +67,7 @@ def add_subparser(subparsers):
         Default: ALL
     """)
     
-    parser.add_argument("--o", dest="overlap", type=int, default=80, help="Specify the percentage of overlap for SV comparison. Default: 80")
+    parser.add_argument("--op", dest="overlap", type=int, default=80, help="Specify the percentage of overlap for SV comparison. Default: 80")
     parser.add_argument("--output", help="Optional output directory to save results.")
     
     # Set the function to call when this subparser is used
