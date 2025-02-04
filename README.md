@@ -73,7 +73,9 @@ panscan make-dup-mtx
 to produce the gene-duplication matrix from all your assmeblies.
 
 Then the second command 
-```panscan gene-dup``` 
+```
+panscan gene-dup
+``` 
 takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
  - Duplications per assembly
  - Venn diagram of duplications w.r.t HPRC and CPC
