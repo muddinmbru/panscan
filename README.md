@@ -68,13 +68,15 @@ The gene sequence files (and scripts to produce them for other references)  are 
 There are 2 parts to this:
 You have to first run 
 ```
-panscan make_dup_mtx
+panscan make_dup_mtx gencode.gff3 assemblies.fofn hg38_ref.fa 64
 ```
 to produce the gene-duplication matrix from all your assmeblies.
 
+**Please Note: The gene duplication modules are only compatible with gencode gff3 files**
+
 Then the second command 
 ```
-panscan gene_dup
+panscan gene_dup gene-dup-matrix.csv gene_dup/hprc-matrix.csv gene_dup/cpc-matrix.csv
 ``` 
 takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
  - Duplications per assembly
@@ -92,7 +94,7 @@ For all modules in this section you can use the Sample.vcf file provided in the 
 This module will convert multi-allelic Pangenome VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
 
 ```
-panscan preprocess_vcf
+panscan preprocess_vcf --i Sample.vcf
 ```
 should be used to process the variants.
 
@@ -100,17 +102,16 @@ should be used to process the variants.
 This module identifies novel sequences present in Pangenome VCF file1 by comparing SV insertions with those in Pangenome VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
 
 ```
-panscan novel_seq
+panscan novel_seq APR.vcf CPC-HPRC.vcf 
 ```
-should be used to process the novel sequences.
 
-We have provided Pangenome VCF files of the APR and CPC-HPRC pangnomes to compare your VCF's with.
+The provided Pangenome VCF files of the APR and CPC-HPRC can be used to be compared with your VCF files as well.
 
 ### Novel Variants
 This module identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
 ```
-panscan find-uniq-variants
+panscan find_uniq_variants --i Sample.vcf --t SNP -db ALL --op 80 --output novel_variants
 ```
 should be used to process novel variants. 
 
