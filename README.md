@@ -4,7 +4,6 @@ Pangenome analyses toolkit.
 
 ## Requirements
 Requires Python >= 3.7
-
 Matplotlib
 perl
 pandas
@@ -51,7 +50,7 @@ The gaf files needed for the complex command can be produced by aligning the gen
 
 ### End-to-end
 Run the ```panscan complex``` to run the command in full to produce complex regions and haplotype walks for each sample in all the regions. 
-``` ```
+
 
 ## Gene-duplication analyses
 
