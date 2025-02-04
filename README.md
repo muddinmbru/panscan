@@ -66,9 +66,15 @@ The gene sequence files (and scripts to produce them for other references)  are 
 ## Gene-duplication analyses
 
 There are 2 parts to this:
-You have to first run ```panscan make-dup-mtx``` to produce the gene-duplication matrix from all your assmeblies.
+You have to first run 
+```
+panscan make-dup-mtx
+```
+to produce the gene-duplication matrix from all your assmeblies.
 
-Then the second comman ```panscan gene-dup``` takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
+Then the second command 
+```panscan gene-dup``` 
+takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
  - Duplications per assembly
  - Venn diagram of duplications w.r.t HPRC and CPC
  - Frequency comparison of your duplications w.r.t. HPRC and CPC . (Plots the most distinct ones)
@@ -81,20 +87,29 @@ For all modules in this section you can use the Sample.vcf file provided in the 
 
 ### Preprocess Vcf
 
-The program will convert multi-allelic Pangenome VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
+This module will convert multi-allelic Pangenome VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
 
-```panscan preprocess_vcf``` should be used to process the variants.
+```
+panscan preprocess_vcf
+```
+should be used to process the variants.
 
 ### Novel seq
-The tool identifies novel sequences present in Pangenome VCF file1 by comparing SV insertions with those in Pangenome VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
+This module identifies novel sequences present in Pangenome VCF file1 by comparing SV insertions with those in Pangenome VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
 
-```panscan novel_seq``` should be used to process the novel sequences.
+```
+panscan novel_seq
+```
+should be used to process the novel sequences.
 
 We have provided Pangenome VCF files of the APR and CPC-HPRC pangnomes to compare your VCF's with.
 
 ### Novel Variants
-The tool identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
+This module identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
-```panscan find-uniq-variants``` should be used to process novel variants. 
+``
+`panscan find-uniq-variants
+```
+should be used to process novel variants. 
 
 **This function needs the path for the databases to be provided to it**. These databases are present in the **database.tar.gz** present in the [Panscan Database](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
