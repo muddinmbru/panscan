@@ -110,7 +110,7 @@ The provided Pangenome VCF files of the APR and CPC-HPRC can be used to be compa
 This module identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
 ```
-panscan find_uniq_variants --i Sample.vcf --t SNP --db ALL --op 80 --output novel_variants  --db-path downloads/databases
+panscan find_uniq_variants --i Sample.vcf --t SNP --db ALL --op 80 --output novel_variants  --db-path downloads/database
 ```
 
 **This function needs the path for the databases to be provided to it**. These databases are present in the **database.tar.gz** present in the [Panscan Database](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
