@@ -3,14 +3,14 @@
 Pangenome analyses toolkit.
 
 ## Requirements
-Requires Python >= 3.7
-Matplotlib
-perl
-pandas
-liftoff 
-[cd-hit] https://github.com/weizhongli/cdhit
-[rtg-tools] https://github.com/RealTimeGenomics/rtg-tools
-[GFABase] https://github.com/mlin/gfabase
+- Python >= 3.7 
+- perl
+- Matplotlib
+- pandas
+- liftoff 
+- [cd-hit](https://github.com/weizhongli/cdhit)
+- [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
+- [GFABase](https://github.com/mlin/gfabase)
 
 
 
