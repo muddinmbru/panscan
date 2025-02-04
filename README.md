@@ -96,7 +96,6 @@ This module will convert multi-allelic Pangenome VCF records to single-allelic o
 ```
 panscan preprocess_vcf --i Sample.vcf
 ```
-should be used to process the variants.
 
 ### Novel seq
 This module identifies novel sequences present in Pangenome VCF file1 by comparing SV insertions with those in Pangenome VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
@@ -111,8 +110,7 @@ The provided Pangenome VCF files of the APR and CPC-HPRC can be used to be compa
 This module identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
 ```
-panscan find_uniq_variants --i Sample.vcf --t SNP -db ALL --op 80 --output novel_variants
+panscan find_uniq_variants --i Sample.vcf --t SNP --db ALL --op 80 --output novel_variants  --db-path downloads/databases
 ```
-should be used to process novel variants. 
 
 **This function needs the path for the databases to be provided to it**. These databases are present in the **database.tar.gz** present in the [Panscan Database](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
