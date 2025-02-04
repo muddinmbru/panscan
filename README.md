@@ -87,4 +87,4 @@ The tool identifies novel variants (SNPs, InDels, and SVs) in the input pangenom
 
 ```panscan find-uniq-variants``` should be used to process novel variants. 
 
-**This function needs the path for the databases to be provided to it**. These databases are present in the **database.tar.gz** present in the [Panscan Database](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).**__
+**This function needs the path for the databases to be provided to it**. These databases are present in the **database.tar.gz** present in the [Panscan Database](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
