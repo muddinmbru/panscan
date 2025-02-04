@@ -73,3 +73,8 @@ The program will convert multi-allelic VCF records to single-allelic ones. Next,
 The tool identifies novel sequences present in VCF file1 by comparing SV insertions with those in VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
 
 ```panscan novel_seq``` should be used to process the novel sequences.
+
+## Novel Variants
+The tool identifies novel variants (SNPs, InDels, and SVs) in the input pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
+
+```panscan find-uniq-variants``` should be used to process novel variants. 
