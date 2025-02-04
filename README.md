@@ -68,20 +68,20 @@ The gene sequence files (and scripts to produce them for other references)  are 
 There are 2 parts to this:
 You have to first run 
 ```
-panscan make-dup-mtx
+panscan make_dup_mtx
 ```
 to produce the gene-duplication matrix from all your assmeblies.
 
 Then the second command 
 ```
-panscan gene-dup
+panscan gene_dup
 ``` 
 takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
  - Duplications per assembly
  - Venn diagram of duplications w.r.t HPRC and CPC
  - Frequency comparison of your duplications w.r.t. HPRC and CPC . (Plots the most distinct ones)
 
-The ```panscan gene-dup``` command will ask you for paths to HPRC and CPC matrices, they are present in the directory you cloned the repo into. Specifically in ```panscan/gene_dup```
+The ```panscan gene_dup``` command will ask you for paths to HPRC and CPC matrices, they are present in the directory you cloned the repo into. Specifically in ```panscan/gene_dup```
 
 ## Pangenome VCF Processing
 
