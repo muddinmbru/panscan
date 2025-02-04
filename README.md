@@ -109,8 +109,8 @@ We have provided Pangenome VCF files of the APR and CPC-HPRC pangnomes to compar
 ### Novel Variants
 This module identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
-``
-`panscan find-uniq-variants
+```
+panscan find-uniq-variants
 ```
 should be used to process novel variants. 
 
