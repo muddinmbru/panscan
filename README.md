@@ -10,6 +10,7 @@ Pangenome analyses toolkit.
 - [liftoff](https://github.com/agshumate/Liftoff) 
 - [cd-hit](https://github.com/weizhongli/cdhit)
 - [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
+- [truvari](https://github.com/ACEnglish/truvari)
 - [GFABase](https://github.com/mlin/gfabase)
 - [GraphAligner](https://github.com/maickrau/GraphAligner)
 - [Panscan Databases](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p)
@@ -67,23 +68,30 @@ You have to first run ```panscan make-dup-mtx``` to produce the gene-duplication
 
 Then the second comman ```panscan gene-dup``` takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
  - Duplications per assembly
- - Venn diagram of duplications w.r.t hprc and cpc
- - Frequency comparison of your duplications w.r.t. hprc and cpc . (Plots the most distinct ones)
+ - Venn diagram of duplications w.r.t HPRC and CPC
+ - Frequency comparison of your duplications w.r.t. HPRC and CPC . (Plots the most distinct ones)
 
+The ```panscan gene-dup``` command will ask you for paths to HPRC and CPC matrices, they are present in the directory you cloned the repo into. Specifically in ```panscan/gene_dup```
 
-## Preprocess Vcf
+## Pangenome VCF Processing
 
-The program will convert multi-allelic VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
+For all modules in this section you can use the Sample.vcf file provided in the repo for testing
+
+### Preprocess Vcf
+
+The program will convert multi-allelic Pangenome VCF records to single-allelic ones. Next, complex indels will be decomposed into SNPs and indels using the RTG tools "decompose" program. Finally, the genotypes of variants at the same locus will be merged to produce the final pre-processed VCF file.
 
 ```panscan preprocess_vcf``` should be used to process the variants.
 
-## Novel seq
-The tool identifies novel sequences present in VCF file1 by comparing SV insertions with those in VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
+### Novel seq
+The tool identifies novel sequences present in Pangenome VCF file1 by comparing SV insertions with those in Pangenome VCF file2 and reports them in FASTA format. Initially, the input VCF files undergo pre-processing, which involves splitting multi-allelic variants into single-allelic ones and decomposing complex variants into indels and SNPs using the "decompose" program from RTG Tools. After pre-processing, the SV insertions in the VCF files are compared using the "truvari bench" command, identifying novel SV insertions in VCF file1. These novel insertions at the same locus are clustered using the CD-HIT program, and the final novel sequence FASTA file is generated.
 
 ```panscan novel_seq``` should be used to process the novel sequences.
 
-## Novel Variants
-The tool identifies novel variants (SNPs, InDels, and SVs) in the input pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
+We have provided Pangenome VCF files of the APR and CPC-HPRC pangnomes to compare your VCF's with.
+
+### Novel Variants
+The tool identifies novel variants (SNPs, InDels, and SVs) in the input Pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
 ```panscan find-uniq-variants``` should be used to process novel variants. 
 
