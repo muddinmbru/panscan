@@ -12,7 +12,7 @@ Pangenome analyses toolkit.
 - [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
 - [GFABase](https://github.com/mlin/gfabase)
 - [GraphAligner](https://github.com/maickrau/GraphAligner)
-- 
+
 
 
 ## Installation
