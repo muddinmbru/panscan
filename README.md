@@ -27,7 +27,9 @@ pip install .
 
 After successful installation run the tool with :
 
-```panscan```
+```
+panscan
+```
 
 
 ## Complex loci analyses 
