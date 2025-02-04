@@ -12,19 +12,19 @@ Pangenome analyses toolkit.
 - [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
 - [GFABase](https://github.com/mlin/gfabase)
 - [GraphAligner](https://github.com/maickrau/GraphAligner)
-
+- [Panscan Databases](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p)
 
 
 ## Installation
-To use Panscan, clone the respository and add it to your path.
+To install Panscan, run:
 
-After cloning, enter the repository and run the comman 
-
+```git clone https://github.com/muddinmbru/panscan.git```
+```cd panscan```
 ```pip install .```
 
-After successful installation run the tool with
+After successful installation run the tool with :
 
-``panscan```
+```panscan```
 
 
 ## Complex loci analyses 
@@ -45,11 +45,14 @@ Complex regions are regions of 100Kb with atleast one complex site and another S
 
 for a region to be considered complex.
 
+
+
 ### End-to-end
 Run the command below in full to produce complex regions and haplotype walks for each sample in all the regions. 
+
 ```panscan complex --ref_fasta chm13v2.0.fa --gaf_file chm13_mapped_genes.gaf --sep_pattern '#0#' --gff3 chm13v2.0_RefSeq_Liftoff_v5.1.gff3 -a 5 -n 1 -s 10000 --regions -l 100000 --sites 1 --sv 1 --ref_name CHM13 panscan.vcf panscan.gfab ```
 
-The gaf files needed for the complex command can be produced by aligning the gene sequences file to your pangenome. The gene sequence files and a script to produce these files are present in the 'complex' directory.
+The gaf files needed for the complex command can be produced by aligning the gene sequences file to your pangenome. The gene sequence files and scripts to produce the gaf file is present in the 'complex.tar.gz' file present in the [Panscan Google Drive](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
 
 
 ## Gene-duplication analyses
@@ -58,9 +61,9 @@ There are 2 parts to this:
 You have to first run ```panscan make-dup-mtx``` to produce the gene-duplication matrix from all your assmeblies.
 
 Then the second comman ```panscan gene-dup``` takes in your gene duplication matrix, and visualizes the duplications in your data and compares them with the hprc and cpc duplications as well. The plots made are :
-Duplications per assembly
-Venn diagram of duplications w.r.t hprc and cpc
-Frequency comparison of your duplications w.r.t. hprc and cpc . Plots the most distinct ones
+ - Duplications per assembly
+ - Venn diagram of duplications w.r.t hprc and cpc
+ - Frequency comparison of your duplications w.r.t. hprc and cpc . (Plots the most distinct ones)
 
 
 ## Preprocess Vcf
@@ -78,3 +81,5 @@ The tool identifies novel sequences present in VCF file1 by comparing SV inserti
 The tool identifies novel variants (SNPs, InDels, and SVs) in the input pangenome VCF file by comparing them against public databases like dbSNP, gnomAD, 1000 Genomes, GME, and DGV.
 
 ```panscan find-uniq-variants``` should be used to process novel variants. 
+
+This function needs the path for the databases to be provided to it. These databases are present in the 'database.tar.gz' present in the [Panscan Google Drive](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
