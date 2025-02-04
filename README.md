@@ -56,7 +56,7 @@ Run the command below in full to produce complex regions and haplotype walks for
 panscan complex --ref_fasta chm13v2.0.fa --gaf_file chm13_mapped_genes.gaf --sep_pattern '#0#' --gff3 chm13v2.0_RefSeq_Liftoff_v5.1.gff3 -a 5 -n 1 -s 10000 --regions -l 100000 --sites 1 --sv 1 --ref_name CHM13 panscan.vcf panscan.gfab
 ```
 
-The gaf files needed for the complex command can be produced by aligning the gene sequences file to your pangenome. The gene sequence files and scripts to produce the gaf file is present in the 'complex.tar.gz' file present in the [Panscan Google Drive](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).
+**The gaf files needed for the complex command can be produced by aligning the gene sequences file to your pangenome. The gene sequence files and scripts to produce the gaf file is present in the 'complex.tar.gz' file present in the [Panscan Google Drive](https://drive.google.com/drive/folders/16O6InjctvIsGSTzroDu2366_wMrTFR3p).**
 
 
 ## Gene-duplication analyses
