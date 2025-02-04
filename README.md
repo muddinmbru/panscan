@@ -6,8 +6,8 @@ Pangenome analyses toolkit.
 - Python >= 3.7 
 - perl
 - Matplotlib
-- pandas
-- liftoff 
+- pandas]
+- [liftoff](https://github.com/agshumate/Liftoff) 
 - [cd-hit](https://github.com/weizhongli/cdhit)
 - [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
 - [GFABase](https://github.com/mlin/gfabase)
