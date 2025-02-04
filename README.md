@@ -6,12 +6,13 @@ Pangenome analyses toolkit.
 - Python >= 3.7 
 - perl
 - Matplotlib
-- pandas]
+- pandas
 - [liftoff](https://github.com/agshumate/Liftoff) 
 - [cd-hit](https://github.com/weizhongli/cdhit)
 - [rtg-tools](https://github.com/RealTimeGenomics/rtg-tools)
 - [GFABase](https://github.com/mlin/gfabase)
-
+- [GraphAligner](https://github.com/maickrau/GraphAligner)
+- 
 
 
 ## Installation
@@ -44,12 +45,11 @@ Complex regions are regions of 100Kb with atleast one complex site and another S
 
 for a region to be considered complex.
 
-Example command: ```panscan complex --ref_fasta chm13v2.0.fa --gaf_file chm13_mapped_genes.gaf --sep_pattern '#0#' --gff3 chm13v2.0_RefSeq_Liftoff_v5.1.gff3 -a 5 -n 1 -s 10000 --regions -l 100000 --sites 1 --sv 1 --ref_name CHM13 panscan.vcf panscan.gfab ```
+### End-to-end
+Run the command below in full to produce complex regions and haplotype walks for each sample in all the regions. 
+```panscan complex --ref_fasta chm13v2.0.fa --gaf_file chm13_mapped_genes.gaf --sep_pattern '#0#' --gff3 chm13v2.0_RefSeq_Liftoff_v5.1.gff3 -a 5 -n 1 -s 10000 --regions -l 100000 --sites 1 --sv 1 --ref_name CHM13 panscan.vcf panscan.gfab ```
 
 The gaf files needed for the complex command can be produced by aligning the gene sequences file to your pangenome. The gene sequence files and a script to produce these files are present in the 'complex' directory.
-
-### End-to-end
-Run the ```panscan complex``` to run the command in full to produce complex regions and haplotype walks for each sample in all the regions. 
 
 
 ## Gene-duplication analyses
