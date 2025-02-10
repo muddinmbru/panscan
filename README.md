@@ -83,6 +83,8 @@ takes in your gene duplication matrix, and visualizes the duplications in your d
  - Venn diagram of duplications w.r.t HPRC and CPC
  - Frequency comparison of your duplications w.r.t. HPRC and CPC . (Plots the most distinct ones)
 
+**As the HPRC and CPC duplciation matrices have only been shared in HG38, we do not recommend using the comparison plots if you use another reference**
+
 The ```panscan gene_dup``` command will ask you for paths to HPRC and CPC matrices, they are present in the directory you cloned the repo into. Specifically in ```panscan/gene_dup```
 
 ## Pangenome VCF Processing
